@@ -1,0 +1,70 @@
+# ansible-playbook test.yml  --ask-become-pass
+
+# https://docs.ansible.com/ansible/latest/modules/dconf_module.html
+#
+# To determine what dconf keys and values to use, you can run `dconf watch /`
+# in a terminal as you make changes in settings or tweaks.  You can also use
+# `dconf read <key>` and `dconf write <key> <value>` to experiment with various
+# settings.  The dconf-editor application is also useful for exploring various
+# keys along with their descriptions.
+
+- hosts: localhost
+  vars:
+    profile_name: myprofile
+    home: "{{ lookup('env','HOME') }}"    
+  tasks:
+
+    - name: install playbook requirements
+      become: true
+      package:
+        name:
+          - python3-psutil
+          - dconf-cli
+          - git  
+
+    - name: read shell output
+      shell: bash new_profile.sh {{ profile_name }}
+      register: uuid
+
+
+    - name: echo
+      ansible.builtin.debug:
+        msg: "{{ uuid.stdout_lines[0] }}"
+        
+
+    - name: set default profile
+      dconf:
+        key: "/org/gnome/terminal/legacy/profiles:/default"
+        value: '"{{ uuid.stdout_lines[0] }}"'  
+
+        
+    - name: disable terminal bell
+      dconf:
+        key: "/org/gnome/terminal/legacy/profiles:/:{{ uuid.stdout_lines[0] }}/audible-bell"
+        value: "false"          
+       
+
+       
+    - name: Creates directory
+      file:
+        path: "{{ home }}/opt/terminal"
+        state: directory
+        
+    - name: clone solarized
+      git:
+        repo: https://github.com/aruhier/gnome-terminal-colors-solarized
+        dest: "{{ home }}/opt/terminal/gnome-terminal-colors-solarized"          
+        
+    - name: Set Solarized color to Default profile
+      command: chdir={{ home }}/opt/terminal/gnome-terminal-colors-solarized ./install.sh -s dark -p {{ uuid.stdout_lines[0] }}
+
+    - name: set width
+      dconf:
+        key: "/org/gnome/terminal/legacy/profiles:/:{{ uuid.stdout_lines[0] }}/default-size-columns"
+        value: '120' 
+        
+    - name: set height
+      dconf:
+        key: "/org/gnome/terminal/legacy/profiles:/:{{ uuid.stdout_lines[0] }}/default-size-rows"
+        value: '40'         
+    

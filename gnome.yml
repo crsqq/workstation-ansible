@@ -1,0 +1,65 @@
+# https://docs.ansible.com/ansible/latest/modules/dconf_module.html
+#
+# To determine what dconf keys and values to use, you can run `dconf watch /`
+# in a terminal as you make changes in settings or tweaks.  You can also use
+# `dconf read <key>` and `dconf write <key> <value>` to experiment with various
+# settings.  The dconf-editor application is also useful for exploring various
+# keys along with their descriptions.
+
+- hosts: localhost
+  tasks:
+
+    - name: install playbook requirements
+      become: true
+      package:
+        name:
+          - python3-psutil
+          - dconf-cli
+          - git
+          
+    #############
+    # shortcuts #
+    #############
+
+    # There are many built-in shortcut actions that only require setting a
+    # binding to enable.
+
+    - name: file browser shortcut
+      dconf:
+        key: "/org/gnome/settings-daemon/plugins/media-keys/home"
+        value: "['<Super>f']"
+
+    - name: web browser shortcut
+      dconf:
+        key: "/org/gnome/settings-daemon/plugins/media-keys/www"
+        value: "['<Super>w']"
+        
+        
+    #####################
+    # terminal settings #
+    #####################
+
+    - name: disable terminal bell
+      dconf:
+        key: "/org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/audible-bell"
+        value: "false"        
+        
+        
+## various
+    - name: no autorun promt
+      dconf:
+        key: "/org/gnome/desktop/media-handling/autorun-never"
+        value: "true"
+        
+## terminal theme
+
+    - name: clone 
+      git:
+        repo: https://github.com/aruhier/gnome-terminal-colors-solarized
+        dest: /home/vmfoo/solarized
+    
+    
+    - name: Set Solarized color to Default profile
+      command: chdir=/home/vmfoo/solarized ./install.sh -s light -p foo
+#      script: /home/vmfoo/solarized/install.sh -s dark -p Unnamed
+#      chdir: /home/vmfoo/solarized

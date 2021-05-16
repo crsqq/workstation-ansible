@@ -1,0 +1,14 @@
+- hosts: localhost
+  vars:
+    home: "{{ lookup('env','HOME') }}"
+  tasks:
+
+    - name: Creates directory
+      file:
+        path: "{{ home }}/opt/terminal"
+        state: directory
+        
+    - name: clone solarized
+      git:
+        repo: https://github.com/aruhier/gnome-terminal-colors-solarized
+        dest: "{{ home }}/opt/terminal/gnome-terminal-colors-solarized"     
