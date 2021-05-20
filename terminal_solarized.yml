@@ -10,7 +10,7 @@
 
 - hosts: localhost
   vars:
-    profile_name: myprofile
+    profile_name: myprofile2
     home: "{{ lookup('env','HOME') }}"    
   tasks:
 
@@ -22,15 +22,22 @@
           - dconf-cli
           - git  
 
-    - name: read shell output
-      shell: bash new_profile.sh {{ profile_name }}
+    - name: check if profile exists
+      shell: bash get_profile_id.sh {{ profile_name }}
       register: uuid
 
-
-    - name: echo
+    - name: Check contents for emptiness
       ansible.builtin.debug:
-        msg: "{{ uuid.stdout_lines[0] }}"
-        
+        msg: "{{ uuid }}"    
+
+    - name: create new profile
+      shell: bash new_profile.sh {{ profile_name }}
+      register: uuid
+      when: uuid.stdout == ""
+
+    - name: check if profile exists
+      shell: bash get_profile_id.sh {{ profile_name }}
+      register: uuid          
 
     - name: set default profile
       dconf:

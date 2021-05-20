@@ -1,14 +1,13 @@
 - hosts: localhost
   vars:
-    home: "{{ lookup('env','HOME') }}"
+    profile_name: myprofile    
   tasks:
 
-    - name: Creates directory
-      file:
-        path: "{{ home }}/opt/terminal"
-        state: directory
-        
-    - name: clone solarized
-      git:
-        repo: https://github.com/aruhier/gnome-terminal-colors-solarized
-        dest: "{{ home }}/opt/terminal/gnome-terminal-colors-solarized"     
+    - name: check if profile exists
+      shell: bash get_profile_id.sh {{ profile_name }}
+      register: profile_id_exists
+
+    - name: Check contents for emptiness
+      ansible.builtin.debug:
+        msg: "{{ profile_id_exists.stdout }}"
+      
