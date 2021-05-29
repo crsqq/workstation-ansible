@@ -1,0 +1,26 @@
+# ansible-playbook test.yml  --ask-become-pass
+
+- hosts: localhost
+  connection: local
+  vars:
+    home: "{{ lookup('env','HOME') }}"
+  tasks:
+
+    - name: install playbook requirements (debian)
+      become: true
+      package:
+        name:
+          - git
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+    - name: install playbook requirements (arch)
+      become: true
+      package:
+        name:
+          - flameshot
+          - tmux
+          - vim
+          - peek
+          - git
+      when: ansible_distribution == 'Archlinux'
+
