@@ -1,6 +1,7 @@
 #!/bin/bash
 dconfdir=/org/gnome/terminal/legacy/profiles:
 
+# https://askubuntu.com/questions/270469/how-can-i-create-a-new-profile-for-gnome-terminal-via-command-line
 create_new_profile() {
     local profile_ids=($(dconf list $dconfdir/ | grep ^: |\
                         sed 's/\///g' | sed 's/://g'))
