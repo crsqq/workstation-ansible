@@ -9,13 +9,6 @@
 - hosts: localhost
   tasks:
 
-    - name: install playbook requirements
-      become: true
-      package:
-        name:
-          - python3-psutil
-          - dconf-cli
-          - git
           
     #############
     # shortcuts #
@@ -33,33 +26,10 @@
       dconf:
         key: "/org/gnome/settings-daemon/plugins/media-keys/www"
         value: "['<Super>w']"
-        
-        
-    #####################
-    # terminal settings #
-    #####################
 
-    - name: disable terminal bell
-      dconf:
-        key: "/org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/audible-bell"
-        value: "false"        
-        
-        
-## various
+    # various #
+    
     - name: no autorun promt
       dconf:
         key: "/org/gnome/desktop/media-handling/autorun-never"
         value: "true"
-        
-## terminal theme
-
-    - name: clone 
-      git:
-        repo: https://github.com/aruhier/gnome-terminal-colors-solarized
-        dest: /home/vmfoo/solarized
-    
-    
-    - name: Set Solarized color to Default profile
-      command: chdir=/home/vmfoo/solarized ./install.sh -s light -p foo
-#      script: /home/vmfoo/solarized/install.sh -s dark -p Unnamed
-#      chdir: /home/vmfoo/solarized

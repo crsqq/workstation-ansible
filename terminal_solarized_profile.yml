@@ -12,27 +12,8 @@
   vars:
     profile_name: myprofile2
     home: "{{ lookup('env','HOME') }}"    
+
   tasks:
-
-    - name: install playbook requirements (debian)
-      become: true
-      package:
-        name:
-          - python3-psutil
-          - dconf-cli
-          - git
-      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-
-    - name: install playbook requirements (arch)
-      become: true
-      package:
-        name:
-          - python-psutil
-          - dconf
-          - git
-      when: ansible_distribution == 'Archlinux'
-
-
     - name: check if profile exists
       shell: bash get_profile_id.sh {{ profile_name }}
       register: uuid
@@ -61,8 +42,6 @@
         key: "/org/gnome/terminal/legacy/profiles:/:{{ uuid.stdout_lines[0] }}/audible-bell"
         value: "false"          
        
-
-       
     - name: Creates directory
       file:
         path: "{{ home }}/opt/terminal"
@@ -85,4 +64,3 @@
       dconf:
         key: "/org/gnome/terminal/legacy/profiles:/:{{ uuid.stdout_lines[0] }}/default-size-rows"
         value: '40'         
-    
